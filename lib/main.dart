@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert';
+import 'setting_page.dart';
 
 void main() => runApp(FlutterRoadmapApp());
 
@@ -714,6 +715,26 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
     }
   }
 
+  void clearAllState() {
+    setState(() {
+      completed = [];
+      timingLogs = {};
+      totalTimes = {};
+      isTiming = {};
+      currentStart = {};
+      activeKey = null;
+      currentSession = Duration.zero;
+      notes = {};
+      noteControllers = {};
+      noteStyles = {};
+      noteHighlights = {};
+      actualStartDate = null;
+      expandedKey = null;
+      searchController.clear();
+      searchQuery = '';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final topics = [
@@ -812,6 +833,25 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                     ),
                   ),
                 );
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.settings, color: Colors.blue[700]),
+              title: Text('Settings'),
+              onTap: () async {
+                Navigator.of(context).pop();
+                final result = await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => SettingPage(),
+                  ),
+                );
+                if (result == true) {
+                  clearAllState();
+                  await loadProgress();
+                  await loadTimingSafe();
+                  await loadNotesSafe();
+                  setState(() {});
+                }
               },
             ),
           ],

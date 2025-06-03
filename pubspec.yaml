@@ -1,6 +1,6 @@
-name: flutter_guide
+name: mission_flutter
 description: A Flutter roadmap tracking app
-publish_to: 'none'
+publish_to: "none"
 version: 1.0.0+1
 
 environment:

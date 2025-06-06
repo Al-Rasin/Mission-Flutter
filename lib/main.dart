@@ -3,21 +3,168 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'setting_page.dart';
+import 'theme_preference.dart';
 
 void main() => runApp(FlutterRoadmapApp());
 
-class FlutterRoadmapApp extends StatelessWidget {
+class FlutterRoadmapApp extends StatefulWidget {
+  @override
+  _FlutterRoadmapAppState createState() => _FlutterRoadmapAppState();
+}
+
+class _FlutterRoadmapAppState extends State<FlutterRoadmapApp> {
+  ThemePreference _themePreference = ThemePreference.system;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadThemePreference();
+  }
+
+  Future<void> _loadThemePreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedTheme = prefs.getString('themePreference');
+    setState(() {
+      _themePreference = savedTheme != null
+          ? ThemePreference.values.firstWhere((e) => e.toString() == savedTheme, orElse: () => ThemePreference.system)
+          : ThemePreference.system;
+    });
+  }
+
+  Future<void> _setThemePreference(ThemePreference preference) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('themePreference', preference.toString());
+    setState(() {
+      _themePreference = preference;
+    });
+  }
+
+  ThemeMode get _themeMode {
+    switch (_themePreference) {
+      case ThemePreference.light:
+        return ThemeMode.light;
+      case ThemePreference.dark:
+        return ThemeMode.dark;
+      case ThemePreference.system:
+        return ThemeMode.system;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Guide',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: RoadmapHomePage(),
+      title: 'Mission Flutter',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.blue[50],
+        cardColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.blue[800],
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        cardTheme: CardTheme(
+          elevation: 1,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        dividerTheme: DividerThemeData(
+          color: Colors.blue[100],
+          thickness: 1,
+        ),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black87),
+          bodyMedium: TextStyle(color: Colors.black87),
+          titleLarge: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+        ),
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: Color(0xFF1A1A1A),
+        cardColor: Color(0xFF2D2D2D),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFF1F1F1F),
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+        cardTheme: CardTheme(
+          elevation: 1,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
+        dividerTheme: DividerThemeData(
+          color: Colors.grey[800],
+          thickness: 1,
+        ),
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.white70),
+          bodyMedium: TextStyle(color: Colors.white70),
+          titleLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        iconTheme: IconThemeData(
+          color: Colors.white70,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Color(0xFF2D2D2D),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          hintStyle: TextStyle(color: Colors.grey[500]),
+        ),
+        switchTheme: SwitchThemeData(
+          thumbColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return Colors.blue[400];
+            }
+            return Colors.grey[400];
+          }),
+          trackColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return Colors.blue[200]!.withOpacity(0.5);
+            }
+            return Colors.grey[600]!.withOpacity(0.5);
+          }),
+        ),
+        checkboxTheme: CheckboxThemeData(
+          fillColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return Colors.blue[400];
+            }
+            return Colors.grey[600];
+          }),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blue[700],
+            foregroundColor: Colors.white,
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+          ),
+        ),
+      ),
+      themeMode: _themeMode,
+      home: RoadmapHomePage(
+        themePreference: _themePreference,
+        onThemeChanged: _setThemePreference,
+      ),
     );
   }
 }
 
 class RoadmapHomePage extends StatefulWidget {
+  final ThemePreference themePreference;
+  final Function(ThemePreference) onThemeChanged;
+
+  const RoadmapHomePage({
+    Key? key,
+    required this.themePreference,
+    required this.onThemeChanged,
+  }) : super(key: key);
+
   @override
   _RoadmapHomePageState createState() => _RoadmapHomePageState();
 }
@@ -464,6 +611,7 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
       context: context,
       isScrollControlled: true,
       builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
         return Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: StatefulBuilder(
@@ -571,9 +719,13 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                       ),
                       decoration: InputDecoration(
                         hintText: 'Enter your note...',
-                        border: OutlineInputBorder(),
-                        fillColor: highlight,
-                        filled: highlight != null,
+                        hintStyle: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[600]),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                        ),
+                        fillColor: isDark ? Color(0xFF2D2D2D) : (highlight ?? Colors.white),
+                        filled: true,
                       ),
                       onChanged: (text) {
                         updateNote(
@@ -737,6 +889,15 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? Color(0xFF1A1A1A) : Colors.blue[50];
+    final cardColor = isDark ? Color(0xFF2D2D2D) : Colors.white;
+    final textColor = isDark ? Colors.white70 : Colors.black87;
+    final subtitleColor = isDark ? Colors.grey[400] : Colors.blueGrey[700];
+    final dividerColor = isDark ? Colors.grey[800] : Colors.blue[100];
+    final searchBarColor = isDark ? Color(0xFF2D2D2D) : Colors.white;
+    final appBarColor = isDark ? Color(0xFF1F1F1F) : Colors.blue[800];
+
     final topics = [
       'All',
       ...{...allItems.map((e) => e.topic)}
@@ -755,19 +916,21 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Roadmap Tracker'),
-        backgroundColor: Colors.blue[800],
+        backgroundColor: appBarColor,
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(56),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: TextField(
               controller: searchController,
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 hintText: 'Search by anything (date, title, note, etc.)',
-                prefixIcon: Icon(Icons.search),
+                hintStyle: TextStyle(color: isDark ? Colors.grey[500] : Colors.grey[600]),
+                prefixIcon: Icon(Icons.search, color: isDark ? Colors.grey[500] : Colors.grey[600]),
                 suffixIcon: searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.clear),
+                        icon: Icon(Icons.clear, color: isDark ? Colors.grey[500] : Colors.grey[600]),
                         onPressed: () {
                           setState(() {
                             searchController.clear();
@@ -781,7 +944,7 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.white,
+                fillColor: searchBarColor,
                 contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               ),
               onChanged: (value) {
@@ -794,11 +957,12 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
         ),
       ),
       drawer: Drawer(
+        backgroundColor: cardColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue[800]),
+              decoration: BoxDecoration(color: appBarColor),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -842,7 +1006,10 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                 Navigator.of(context).pop();
                 final result = await Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => SettingPage(),
+                    builder: (context) => SettingPage(
+                      themePreference: widget.themePreference,
+                      onThemeChanged: widget.onThemeChanged,
+                    ),
                   ),
                 );
                 if (result == true) {
@@ -874,7 +1041,7 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
         },
       ),
       body: Container(
-        color: Colors.blue[50],
+        color: backgroundColor,
         child: Column(
           children: [
             Padding(
@@ -884,6 +1051,7 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                   Card(
                     elevation: 1,
                     margin: EdgeInsets.symmetric(vertical: 4),
+                    color: isDark ? Color(0xFF2D2D2D) : Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -923,7 +1091,13 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
             ),
             Expanded(
               child: filteredItems.isEmpty
-                  ? Center(
+                  ? Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? Color(0xFF2D2D2D) : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
+                      ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -951,12 +1125,16 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                         final hasSessionLog = (timingLogs[key]?.isNotEmpty ?? false);
                         final isTimerRunning = isTiming[key] == true && activeKey == key;
                         return Card(
-                          color: isCompleted ? Colors.green[50] : Colors.white,
+                          color: isDark ? Color(0xFF2D2D2D) : (isCompleted ? Colors.green[50] : Colors.white),
                           elevation: 1,
                           margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: getPriorityColor(item.priority, background: true), width: 2),
+                            side: BorderSide(
+                                color: isDark
+                                    ? (getPriorityColor(item.priority, background: true).withOpacity(0.3))
+                                    : getPriorityColor(item.priority, background: true),
+                                width: 2),
                           ),
                           child: Stack(
                             children: [
@@ -1202,13 +1380,21 @@ class _RoadmapHomePageState extends State<RoadmapHomePage> {
                                           width: double.infinity,
                                           padding: EdgeInsets.all(8),
                                           decoration: BoxDecoration(
-                                            color: notes[key]?['highlight'] != null ? Color(notes[key]!['highlight']) : Colors.grey[100],
+                                            color: isDark
+                                                ? (notes[key]?['highlight'] != null
+                                                    ? Color(notes[key]!['highlight']).withOpacity(0.3)
+                                                    : Color(0xFF2D2D2D))
+                                                : (notes[key]?['highlight'] != null ? Color(notes[key]!['highlight']) : Colors.grey[100]),
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: Colors.blue[50]!),
+                                            border: Border.all(
+                                              color: isDark ? Colors.grey[700]! : Colors.blue[50]!,
+                                            ),
                                           ),
                                           child: Text(
                                             notes[key]?['text'] ?? 'No notes yet.',
-                                            style: getNoteStyle(key),
+                                            style: getNoteStyle(key).copyWith(
+                                              color: isDark ? Colors.white70 : getNoteStyle(key).color,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -1288,51 +1474,48 @@ class _ProgressPageState extends State<ProgressPage> {
 
   @override
   Widget build(BuildContext context) {
-    final completedCount = completedItems.length;
-    final totalCount = widget.totalCount;
-    final progress = totalCount == 0 ? 0.0 : completedCount / totalCount;
-    final notes = widget.notes;
-    final timingLogs = widget.timingLogs;
-    final totalTimes = widget.totalTimes;
-    final getDynamicDate = widget.getDynamicDate;
-    final getPriorityColor = widget.getPriorityColor;
-    final getNoteStyle = widget.getNoteStyle;
-    final isNoteImportant = widget.isNoteImportant;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? Color(0xFF1A1A1A) : Colors.blue[50];
+    final cardColor = isDark ? Color(0xFF2D2D2D) : Colors.green[50];
+    final textColor = isDark ? Colors.white70 : Colors.black87;
+    final subtitleColor = isDark ? Colors.grey[400] : Colors.blueGrey[700];
+    final appBarColor = isDark ? Color(0xFF1F1F1F) : Colors.blue[800];
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Progress'),
-        backgroundColor: Colors.blue[800],
+        backgroundColor: appBarColor,
       ),
-      body: Padding(
+      body: Container(
+        color: backgroundColor,
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Progress', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.blue[900])),
+            Text('Progress', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.blue[900])),
             SizedBox(height: 16),
             LinearProgressIndicator(
-              value: progress,
+              value: widget.progress,
               minHeight: 14,
               backgroundColor: Colors.blue[100],
               valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
             ),
             SizedBox(height: 12),
-            Text('$completedCount of $totalCount completed', style: TextStyle(fontSize: 16, color: Colors.blueGrey[800])),
+            Text('${widget.completedCount} of ${widget.totalCount} completed', style: TextStyle(fontSize: 16, color: Colors.blueGrey[800])),
             SizedBox(height: 24),
             Text('Completed Items', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green[800])),
             SizedBox(height: 8),
             Expanded(
-              child: completedItems.isEmpty
+              child: widget.completedItems.isEmpty
                   ? Center(child: Text('No items completed yet.'))
                   : ListView.builder(
-                      itemCount: completedItems.length,
+                      itemCount: widget.completedItems.length,
                       itemBuilder: (context, idx) {
-                        final item = completedItems[idx];
+                        final item = widget.completedItems[idx];
                         final key = '${item.day}-${item.subtopic}';
                         final isChallenge = item.subtopic.toLowerCase().contains('challenge');
                         return Card(
-                          color: Colors.green[50],
+                          color: isDark ? Color(0xFF2D2D2D) : Colors.green[50],
                           margin: EdgeInsets.symmetric(vertical: 6),
                           child: ExpansionTile(
                             leading: Text(item.icon, style: TextStyle(fontSize: 26)),
@@ -1370,9 +1553,9 @@ class _ProgressPageState extends State<ProgressPage> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(item.topic, style: TextStyle(color: Colors.blueGrey[700], fontSize: 13)),
+                                  Text(item.topic, style: TextStyle(color: subtitleColor, fontSize: 13)),
                                   SizedBox(height: 2),
-                                  Text('Date: ${getDynamicDate(item.day)}', style: TextStyle(color: Colors.blueGrey[400], fontSize: 12)),
+                                  Text('Date: ${widget.getDynamicDate(item.day)}', style: TextStyle(color: Colors.blueGrey[400], fontSize: 12)),
                                   SizedBox(height: 2),
                                   Row(
                                     children: [
@@ -1380,7 +1563,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                       Text(
                                         item.priority,
                                         style: TextStyle(
-                                          color: getPriorityColor(item.priority),
+                                          color: widget.getPriorityColor(item.priority),
                                           fontWeight: FontWeight.bold,
                                           fontSize: 12,
                                         ),
@@ -1401,16 +1584,16 @@ class _ProgressPageState extends State<ProgressPage> {
                                     Row(
                                       children: [
                                         Text('Total: ', style: TextStyle(color: Colors.blue[700], fontSize: 13)),
-                                        Text(formatDuration(totalTimes[key] ?? Duration.zero),
+                                        Text(formatDuration(widget.totalTimes[key] ?? Duration.zero),
                                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                       ],
                                     ),
                                     SizedBox(height: 8),
-                                    if ((timingLogs[key]?.isNotEmpty ?? false)) ...[
+                                    if ((widget.timingLogs[key]?.isNotEmpty ?? false)) ...[
                                       Divider(),
                                       Text('Session Log', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                                       SizedBox(height: 4),
-                                      ...timingLogs[key]!.map((log) {
+                                      ...widget.timingLogs[key]!.map((log) {
                                         final start = DateTime.tryParse(log['start'] ?? '') ?? DateTime.now();
                                         final end = DateTime.tryParse(log['end'] ?? '') ?? DateTime.now();
                                         final duration = Duration(seconds: log['duration'] ?? 0);
@@ -1438,7 +1621,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                     Row(
                                       children: [
                                         Text('Notes', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800], fontSize: 15)),
-                                        if (isNoteImportant(key))
+                                        if (widget.isNoteImportant(key))
                                           Padding(
                                             padding: const EdgeInsets.only(left: 8.0),
                                             child: Icon(Icons.star, color: Colors.orange, size: 20),
@@ -1450,13 +1633,13 @@ class _ProgressPageState extends State<ProgressPage> {
                                       width: double.infinity,
                                       padding: EdgeInsets.all(8),
                                       decoration: BoxDecoration(
-                                        color: notes[key]?['highlight'] != null ? Color(notes[key]!['highlight']) : Colors.grey[100],
+                                        color: widget.notes[key]?['highlight'] != null ? Color(widget.notes[key]!['highlight']) : Colors.grey[100],
                                         borderRadius: BorderRadius.circular(8),
                                         border: Border.all(color: Colors.blue[50]!),
                                       ),
                                       child: Text(
-                                        notes[key]?['text'] ?? 'No notes yet.',
-                                        style: getNoteStyle(key),
+                                        widget.notes[key]?['text'] ?? 'No notes yet.',
+                                        style: widget.getNoteStyle(key),
                                       ),
                                     ),
                                   ],

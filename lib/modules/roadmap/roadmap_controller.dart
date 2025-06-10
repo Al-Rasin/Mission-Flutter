@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'roadmap_model.dart';
+import '../../theme/app_colors.dart';
 
 class RoadmapController {
   final RoadmapModel model;
@@ -26,6 +27,9 @@ class RoadmapController {
   String searchQuery = '';
   String? expandedKey;
   DateTime? actualStartDate;
+
+  // Callback for UI updates
+  VoidCallback? onTimerUpdate;
 
   RoadmapController(this.model);
 
@@ -120,6 +124,8 @@ class RoadmapController {
     timer?.cancel();
     timer = Timer.periodic(Duration(seconds: 1), (_) {
       currentSession += Duration(seconds: 1);
+      // Notify UI to update
+      onTimerUpdate?.call();
     });
   }
 
@@ -141,6 +147,8 @@ class RoadmapController {
       currentStart[key] = null;
       currentSession = Duration.zero;
       saveTiming();
+      // Notify UI to update
+      onTimerUpdate?.call();
     }
   }
 
@@ -148,6 +156,8 @@ class RoadmapController {
     pauseTimer(key);
     currentSession = Duration.zero;
     activeKey = null;
+    // Notify UI to update
+    onTimerUpdate?.call();
   }
 
   Future<void> resetTimer(String key) async {
@@ -157,6 +167,8 @@ class RoadmapController {
     currentStart[key] = null;
     currentSession = Duration.zero;
     saveTiming();
+    // Notify UI to update
+    onTimerUpdate?.call();
   }
 
   String formatDuration(Duration d) {
@@ -411,16 +423,7 @@ class RoadmapController {
   }
 
   Color getPriorityColor(String priority, {bool background = false}) {
-    switch (priority.toLowerCase()) {
-      case 'high':
-        return background ? Colors.red[50]! : Colors.red[700]!;
-      case 'medium':
-        return background ? Colors.orange[50]! : Colors.orange[700]!;
-      case 'low':
-        return background ? Colors.green[50]! : Colors.green[700]!;
-      default:
-        return background ? Colors.grey[100]! : Colors.grey[700]!;
-    }
+    return AppColors.getPriorityColor(priority, background: background);
   }
 
   String getDynamicDate(String day) {

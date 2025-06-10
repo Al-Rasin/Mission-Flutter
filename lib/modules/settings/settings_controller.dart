@@ -7,8 +7,13 @@ class SettingsController {
     await prefs.setString('themePreference', preference.toString());
   }
 
-  Future<void> resetApp() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
+  Future<bool> resetApp() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

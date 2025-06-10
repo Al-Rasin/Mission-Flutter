@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/theme_preference.dart';
+import '../../theme/app_colors.dart';
 import 'settings_controller.dart';
+import 'settings_model.dart';
 
 class SettingsView extends StatefulWidget {
   final ThemePreference themePreference;
@@ -62,43 +65,241 @@ class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = AppColors.getBackgroundColor(isDark);
+    final cardColor = AppColors.getCardColor(isDark);
+    final textColor = AppColors.getTextPrimaryColor(isDark);
+    final subtitleColor = AppColors.getTextSecondaryColor(isDark);
+    final appBarColor = AppColors.getAppBarColor(isDark);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
+        backgroundColor: appBarColor,
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: Text('Theme'),
-            subtitle: Text('Choose app theme'),
-          ),
-          RadioListTile<ThemePreference>(
-            title: Text('System'),
-            value: ThemePreference.system,
-            groupValue: _themePreference,
-            onChanged: _onThemeChanged,
-          ),
-          RadioListTile<ThemePreference>(
-            title: Text('Light'),
-            value: ThemePreference.light,
-            groupValue: _themePreference,
-            onChanged: _onThemeChanged,
-          ),
-          RadioListTile<ThemePreference>(
-            title: Text('Dark'),
-            value: ThemePreference.dark,
-            groupValue: _themePreference,
-            onChanged: _onThemeChanged,
-          ),
-          Divider(),
-          ListTile(
-            title: Text('Reset App'),
-            subtitle: Text('Clear all progress, notes, and settings'),
-            trailing: Icon(Icons.restore, color: Colors.red),
-            onTap: _onResetApp,
-          ),
-        ],
+      backgroundColor: backgroundColor,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Card(
+              color: cardColor,
+              elevation: 1,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Theme Settings',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.palette, color: AppColors.primaryAccent),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Theme Mode',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: textColor,
+                            ),
+                          ),
+                        ),
+                        DropdownButton<ThemePreference>(
+                          value: widget.themePreference,
+                          underline: Container(),
+                          items: ThemePreference.values.map((preference) {
+                            return DropdownMenuItem<ThemePreference>(
+                              value: preference,
+                              child: Text(
+                                preference.displayName,
+                                style: TextStyle(color: textColor),
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (ThemePreference? newValue) {
+                            if (newValue != null) {
+                              widget.onThemeChanged(newValue);
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Card(
+              color: cardColor,
+              elevation: 1,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'App Data',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.refresh, color: AppColors.warning),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Reset App Data',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: textColor,
+                                ),
+                              ),
+                              Text(
+                                'Clear all progress, timers, and notes',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: subtitleColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () {
+                            _resetAppData();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.error,
+                            foregroundColor: Colors.white,
+                          ),
+                          child: Text('Reset'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16),
+            Card(
+              color: cardColor,
+              elevation: 1,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'About',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: textColor,
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Icon(Icons.info, color: AppColors.info),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mission Flutter',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: textColor,
+                                ),
+                              ),
+                              Text(
+                                'Flutter Learning Roadmap Tracker',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: subtitleColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  void _showResetDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardColor = AppColors.getCardColor(isDark);
+    final textColor = AppColors.getTextPrimaryColor(isDark);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: cardColor,
+          title: Text(
+            'Reset App Data',
+            style: TextStyle(color: textColor),
+          ),
+          content: Text(
+            'Are you sure you want to reset all app data? This will clear:\n\n• All progress tracking\n• Timer logs\n• Notes\n• Settings\n\nThis action cannot be undone.',
+            style: TextStyle(color: textColor),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: AppColors.getTextSecondaryColor(isDark)),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _resetAppData();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.error,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Reset'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _resetAppData() async {
+    final success = await _controller.resetApp();
+    if (mounted) {
+      Navigator.of(context).pop(success);
+    }
   }
 }

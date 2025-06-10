@@ -4,6 +4,7 @@ import 'dart:async';
 import 'dart:convert';
 import '../../theme/theme_preference.dart';
 import '../../modules/settings/settings_view.dart';
+import '../../theme/app_colors.dart';
 import 'roadmap_model.dart';
 import 'roadmap_controller.dart';
 
@@ -30,6 +31,11 @@ class _RoadmapViewState extends State<RoadmapView> {
     super.initState();
     _model = RoadmapModel();
     _controller = RoadmapController(_model);
+    _controller.onTimerUpdate = () {
+      setState(() {
+        // This will rebuild the UI when timer updates
+      });
+    };
     _controller.loadProgress();
     _controller.loadTimingSafe();
     _controller.loadNotesSafe();
@@ -38,24 +44,31 @@ class _RoadmapViewState extends State<RoadmapView> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = AppColors.getBackgroundColor(isDark);
+    final cardColor = AppColors.getCardColor(isDark);
+    final textColor = AppColors.getTextPrimaryColor(isDark);
+    final subtitleColor = AppColors.getTextSecondaryColor(isDark);
+    final appBarColor = AppColors.getAppBarColor(isDark);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Roadmap Tracker'),
-        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+        backgroundColor: appBarColor,
         bottom: PreferredSize(
           preferredSize: Size.fromHeight(56),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
             child: TextField(
               controller: _controller.searchController,
-              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+              style: TextStyle(color: textColor),
               decoration: InputDecoration(
                 hintText: 'Search by anything (date, title, note, etc.)',
-                hintStyle: TextStyle(color: Theme.of(context).hintColor),
-                prefixIcon: Icon(Icons.search, color: Theme.of(context).hintColor),
+                hintStyle: TextStyle(color: AppColors.getTextHintColor(isDark)),
+                prefixIcon: Icon(Icons.search, color: AppColors.getTextHintColor(isDark)),
                 suffixIcon: _controller.searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: Icon(Icons.clear, color: Theme.of(context).hintColor),
+                        icon: Icon(Icons.clear, color: AppColors.getTextHintColor(isDark)),
                         onPressed: () {
                           setState(() {
                             _controller.searchController.clear();
@@ -69,7 +82,7 @@ class _RoadmapViewState extends State<RoadmapView> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Theme.of(context).cardColor,
+                fillColor: AppColors.getInputBackgroundColor(isDark),
                 contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 16),
               ),
               onChanged: (value) {
@@ -82,12 +95,12 @@ class _RoadmapViewState extends State<RoadmapView> {
         ),
       ),
       drawer: Drawer(
-        backgroundColor: Theme.of(context).cardColor,
+        backgroundColor: cardColor,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Theme.of(context).appBarTheme.backgroundColor),
+              decoration: BoxDecoration(color: appBarColor),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -99,7 +112,7 @@ class _RoadmapViewState extends State<RoadmapView> {
               ),
             ),
             ListTile(
-              leading: Icon(Icons.track_changes, color: Colors.blue[700]),
+              leading: Icon(Icons.track_changes, color: AppColors.primaryAccent),
               title: Text('Progress'),
               onTap: () {
                 Navigator.of(context).pop();
@@ -125,7 +138,7 @@ class _RoadmapViewState extends State<RoadmapView> {
               },
             ),
             ListTile(
-              leading: Icon(Icons.settings, color: Colors.blue[700]),
+              leading: Icon(Icons.settings, color: AppColors.primaryAccent),
               title: Text('Settings'),
               onTap: () async {
                 Navigator.of(context).pop();
@@ -150,7 +163,7 @@ class _RoadmapViewState extends State<RoadmapView> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.blue[700],
+        backgroundColor: AppColors.primaryDark,
         child: Icon(Icons.flag),
         tooltip: 'Jump to next Challenge',
         onPressed: () {
@@ -166,7 +179,7 @@ class _RoadmapViewState extends State<RoadmapView> {
         },
       ),
       body: Container(
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: backgroundColor,
         child: Column(
           children: [
             Padding(
@@ -176,13 +189,13 @@ class _RoadmapViewState extends State<RoadmapView> {
                   Card(
                     elevation: 1,
                     margin: EdgeInsets.symmetric(vertical: 4),
-                    color: Theme.of(context).cardColor,
+                    color: cardColor,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       child: Row(
                         children: [
-                          Icon(Icons.filter_list, color: Colors.blue[700]),
+                          Icon(Icons.filter_list, color: AppColors.primaryAccent),
                           SizedBox(width: 12),
                           Expanded(
                             child: DropdownButtonHideUnderline(
@@ -219,23 +232,23 @@ class _RoadmapViewState extends State<RoadmapView> {
                   ? Container(
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).cardColor,
+                        color: cardColor,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: Theme.of(context).dividerColor),
+                        border: Border.all(color: AppColors.getDividerColor(isDark)),
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.search_off, size: 60, color: Colors.blueGrey[200]),
+                          Icon(Icons.search_off, size: 60, color: AppColors.getTextHintColor(isDark)),
                           SizedBox(height: 16),
                           Text(
                             'No items found for your filter.',
-                            style: TextStyle(fontSize: 18, color: Colors.blueGrey[600], fontWeight: FontWeight.w500),
+                            style: TextStyle(fontSize: 18, color: AppColors.getTextSecondaryColor(isDark), fontWeight: FontWeight.w500),
                           ),
                           SizedBox(height: 8),
                           Text(
                             'Try changing your search or filters.',
-                            style: TextStyle(fontSize: 15, color: Colors.blueGrey[400]),
+                            style: TextStyle(fontSize: 15, color: AppColors.getTextHintColor(isDark)),
                           ),
                         ],
                       ),
@@ -251,7 +264,7 @@ class _RoadmapViewState extends State<RoadmapView> {
                         final isTimerRunning = _controller.isTiming[key] == true && _controller.activeKey == key;
 
                         return Card(
-                          color: isCompleted ? Colors.green[50] : Theme.of(context).cardColor,
+                          color: isCompleted ? AppColors.successLight : cardColor,
                           elevation: 1,
                           margin: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           shape: RoundedRectangleBorder(
@@ -279,7 +292,7 @@ class _RoadmapViewState extends State<RoadmapView> {
                                       padding: const EdgeInsets.only(top: 2.0),
                                       child: Text(
                                         item.day,
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[900]),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryDark),
                                       ),
                                     ),
                                     SizedBox(width: 8),
@@ -288,7 +301,7 @@ class _RoadmapViewState extends State<RoadmapView> {
                                         item.subtopic,
                                         style: TextStyle(
                                           fontWeight: isChallenge ? FontWeight.bold : FontWeight.normal,
-                                          color: Theme.of(context).textTheme.bodyLarge?.color,
+                                          color: textColor,
                                         ),
                                         overflow: _controller.expandedKey == key ? null : TextOverflow.ellipsis,
                                         maxLines: _controller.expandedKey == key ? null : 1,
@@ -300,11 +313,11 @@ class _RoadmapViewState extends State<RoadmapView> {
                                         child: Container(
                                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.orange[100],
+                                            color: AppColors.challengeLight,
                                             borderRadius: BorderRadius.circular(8),
                                           ),
                                           child: Text('CHALLENGE',
-                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.challenge)),
                                         ),
                                       ),
                                     if (isTimerRunning)
@@ -313,18 +326,18 @@ class _RoadmapViewState extends State<RoadmapView> {
                                         child: Container(
                                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.blue[50],
+                                            color: AppColors.infoLight,
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: Colors.blue[200]!),
+                                            border: Border.all(color: AppColors.info),
                                           ),
                                           child: Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Icon(Icons.timer, size: 16, color: Colors.blue[700]),
+                                              Icon(Icons.timer, size: 16, color: AppColors.info),
                                               SizedBox(width: 4),
                                               Text(
                                                 _controller.formatDuration(_controller.currentSession),
-                                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blue[800]),
+                                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.info),
                                               ),
                                             ],
                                           ),
@@ -336,11 +349,11 @@ class _RoadmapViewState extends State<RoadmapView> {
                                         child: Container(
                                           padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: Colors.blue[100],
+                                            color: AppColors.infoLight,
                                             borderRadius: BorderRadius.circular(8),
                                           ),
-                                          child: Text('In Progress',
-                                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blue[800])),
+                                          child:
+                                              Text('In Progress', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.info)),
                                         ),
                                       ),
                                   ],
@@ -350,10 +363,10 @@ class _RoadmapViewState extends State<RoadmapView> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(item.topic, style: TextStyle(color: Colors.blueGrey[700], fontSize: 13)),
+                                      Text(item.topic, style: TextStyle(color: subtitleColor, fontSize: 13)),
                                       SizedBox(height: 2),
                                       Text('Date: ${_controller.getDynamicDate(item.day)}',
-                                          style: TextStyle(color: Colors.blueGrey[400], fontSize: 12)),
+                                          style: TextStyle(color: AppColors.getTextHintColor(isDark), fontSize: 12)),
                                       SizedBox(height: 2),
                                       Row(
                                         children: [
@@ -383,11 +396,11 @@ class _RoadmapViewState extends State<RoadmapView> {
                                               _controller.toggleComplete(key);
                                               setState(() {});
                                             },
-                                            activeColor: Colors.green,
+                                            activeColor: AppColors.success,
                                           ),
                                           Text(
                                             _controller.completed.contains(key) ? 'Marked as Read' : 'Mark as Read',
-                                            style: TextStyle(fontWeight: FontWeight.w500, color: Colors.blueGrey[800]),
+                                            style: TextStyle(fontWeight: FontWeight.w500, color: AppColors.getTextSecondaryColor(isDark)),
                                           ),
                                         ],
                                       ),
@@ -397,11 +410,12 @@ class _RoadmapViewState extends State<RoadmapView> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text('Learning Timer', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800], fontSize: 15)),
+                                        Text('Learning Timer',
+                                            style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryDark, fontSize: 15)),
                                         SizedBox(height: 6),
                                         Row(
                                           children: [
-                                            Text('Total: ', style: TextStyle(color: Colors.blue[700], fontSize: 13)),
+                                            Text('Total: ', style: TextStyle(color: AppColors.primaryAccent, fontSize: 13)),
                                             Text(_controller.formatDuration(_controller.totalTimes[key] ?? Duration.zero),
                                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                           ],
@@ -410,7 +424,8 @@ class _RoadmapViewState extends State<RoadmapView> {
                                         Row(
                                           children: [
                                             IconButton(
-                                              icon: Icon(Icons.play_arrow, color: isTimerRunning ? Colors.grey : Colors.blue[700]),
+                                              icon: Icon(Icons.play_arrow,
+                                                  color: isTimerRunning ? AppColors.getTextHintColor(isDark) : AppColors.primaryAccent),
                                               onPressed: isTimerRunning
                                                   ? null
                                                   : () {
@@ -420,7 +435,8 @@ class _RoadmapViewState extends State<RoadmapView> {
                                               tooltip: 'Start',
                                             ),
                                             IconButton(
-                                              icon: Icon(Icons.pause, color: isTimerRunning ? Colors.orange[700] : Colors.grey),
+                                              icon: Icon(Icons.pause,
+                                                  color: isTimerRunning ? AppColors.timerPaused : AppColors.getTextHintColor(isDark)),
                                               onPressed: isTimerRunning
                                                   ? () {
                                                       _controller.pauseTimer(key);
@@ -432,8 +448,8 @@ class _RoadmapViewState extends State<RoadmapView> {
                                             IconButton(
                                               icon: Icon(Icons.stop,
                                                   color: (isTimerRunning || (_controller.totalTimes[key] ?? Duration.zero) > Duration.zero)
-                                                      ? Colors.red[700]
-                                                      : Colors.grey),
+                                                      ? AppColors.timerStopped
+                                                      : AppColors.getTextHintColor(isDark)),
                                               onPressed: (isTimerRunning || (_controller.totalTimes[key] ?? Duration.zero) > Duration.zero)
                                                   ? () {
                                                       _controller.stopTimer(key);
@@ -446,8 +462,8 @@ class _RoadmapViewState extends State<RoadmapView> {
                                               icon: Icon(Icons.refresh,
                                                   color: (_controller.totalTimes[key] ?? Duration.zero) > Duration.zero ||
                                                           (_controller.timingLogs[key]?.isNotEmpty ?? false)
-                                                      ? Colors.red
-                                                      : Colors.grey),
+                                                      ? AppColors.error
+                                                      : AppColors.getTextHintColor(isDark)),
                                               onPressed: (_controller.totalTimes[key] ?? Duration.zero) > Duration.zero ||
                                                       (_controller.timingLogs[key]?.isNotEmpty ?? false)
                                                   ? () => _controller.resetTimer(key)
@@ -476,11 +492,11 @@ class _RoadmapViewState extends State<RoadmapView> {
                                                       'Start: ${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')} | '
                                                       'End: ${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')} | '
                                                       'Duration: ${_controller.formatDuration(duration)}',
-                                                      style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                                                      style: TextStyle(fontSize: 12, color: AppColors.getTextSecondaryColor(isDark)),
                                                     ),
                                                   ),
                                                   IconButton(
-                                                    icon: Icon(Icons.delete, size: 18, color: Colors.red[400]),
+                                                    icon: Icon(Icons.delete, size: 18, color: AppColors.error),
                                                     tooltip: 'Delete this session',
                                                     onPressed: () => _controller.deleteSessionLog(key, i),
                                                   ),
@@ -500,15 +516,15 @@ class _RoadmapViewState extends State<RoadmapView> {
                                       children: [
                                         Row(
                                           children: [
-                                            Text('Notes', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800], fontSize: 15)),
+                                            Text('Notes', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primaryDark, fontSize: 15)),
                                             if (_controller.isNoteImportant(key))
                                               Padding(
                                                 padding: const EdgeInsets.only(left: 8.0),
-                                                child: Icon(Icons.star, color: Colors.orange, size: 20),
+                                                child: Icon(Icons.star, color: AppColors.warning, size: 20),
                                               ),
                                             Spacer(),
                                             IconButton(
-                                              icon: Icon(Icons.edit, size: 18, color: Colors.blue[700]),
+                                              icon: Icon(Icons.edit, size: 18, color: AppColors.primaryAccent),
                                               onPressed: () => _controller.showNoteEditor(context, key),
                                               tooltip: 'Edit Note',
                                             ),
@@ -521,16 +537,14 @@ class _RoadmapViewState extends State<RoadmapView> {
                                           decoration: BoxDecoration(
                                             color: _controller.notes[key]?['highlight'] != null
                                                 ? Color(_controller.notes[key]!['highlight'])
-                                                : Theme.of(context).cardColor,
+                                                : cardColor,
                                             borderRadius: BorderRadius.circular(8),
-                                            border: Border.all(color: Theme.of(context).dividerColor),
+                                            border: Border.all(color: AppColors.getDividerColor(isDark)),
                                           ),
                                           child: Text(
                                             _controller.notes[key]?['text'] ?? 'No notes yet.',
                                             style: _controller.getNoteStyle(key).copyWith(
-                                                  color: Theme.of(context).brightness == Brightness.dark
-                                                      ? Colors.white70
-                                                      : _controller.getNoteStyle(key).color,
+                                                  color: isDark ? AppColors.darkTextPrimary : _controller.getNoteStyle(key).color,
                                                 ),
                                           ),
                                         ),
@@ -553,7 +567,7 @@ class _RoadmapViewState extends State<RoadmapView> {
 }
 
 // ProgressPage class (simplified for now)
-class ProgressPage extends StatelessWidget {
+class ProgressPage extends StatefulWidget {
   final int completedCount;
   final int totalCount;
   final List<RoadmapItem> completedItems;
@@ -586,10 +600,252 @@ class ProgressPage extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ProgressPage> createState() => _ProgressPageState();
+}
+
+class _ProgressPageState extends State<ProgressPage> {
+  late List<RoadmapItem> completedItems;
+  late int completedCount;
+  late double progress;
+
+  @override
+  void initState() {
+    super.initState();
+    completedItems = List<RoadmapItem>.from(widget.completedItems);
+    completedCount = widget.completedCount;
+    progress = widget.progress;
+  }
+
+  @override
+  void didUpdateWidget(ProgressPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.completedItems != widget.completedItems) {
+      setState(() {
+        completedItems = List<RoadmapItem>.from(widget.completedItems);
+        completedCount = widget.completedCount;
+        progress = widget.progress;
+      });
+    }
+  }
+
+  void handleUnmarkComplete(String key) async {
+    widget.onUnmarkComplete(key);
+    setState(() {
+      completedItems = completedItems.where((item) => '${item.day}-${item.subtopic}' != key).toList();
+      completedCount = completedItems.length;
+      progress = completedCount / widget.totalCount.clamp(1, widget.totalCount);
+    });
+  }
+
+  String formatDuration(Duration d) {
+    String two(int n) => n.toString().padLeft(2, '0');
+    return "${two(d.inHours)}:${two(d.inMinutes % 60)}:${two(d.inSeconds % 60)}";
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = AppColors.getBackgroundColor(isDark);
+    final cardColor = AppColors.getCardColor(isDark);
+    final textColor = AppColors.getTextPrimaryColor(isDark);
+    final subtitleColor = AppColors.getTextSecondaryColor(isDark);
+    final appBarColor = AppColors.getAppBarColor(isDark);
+
     return Scaffold(
-      appBar: AppBar(title: Text('Your Progress')),
-      body: Center(child: Text('Progress page - ${completedCount}/${totalCount} completed')),
+      appBar: AppBar(
+        title: Text('Your Progress'),
+        backgroundColor: appBarColor,
+      ),
+      body: Container(
+        color: backgroundColor,
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Progress', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.blue[900])),
+            SizedBox(height: 16),
+            LinearProgressIndicator(
+              value: progress,
+              minHeight: 14,
+              backgroundColor: Colors.blue[100],
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue[700]!),
+            ),
+            SizedBox(height: 12),
+            Text('$completedCount of ${widget.totalCount} completed', style: TextStyle(fontSize: 16, color: Colors.blueGrey[800])),
+            SizedBox(height: 24),
+            Text('Completed Items', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green[800])),
+            SizedBox(height: 8),
+            Expanded(
+              child: completedItems.isEmpty
+                  ? Center(child: Text('No items completed yet.'))
+                  : ListView.builder(
+                      itemCount: completedItems.length,
+                      itemBuilder: (context, idx) {
+                        final item = completedItems[idx];
+                        final key = '${item.day}-${item.subtopic}';
+                        final isChallenge = item.subtopic.toLowerCase().contains('challenge');
+                        return Card(
+                          color: isDark ? Color(0xFF2D2D2D) : Colors.green[50],
+                          margin: EdgeInsets.symmetric(vertical: 6),
+                          child: ExpansionTile(
+                            leading: Text(item.icon, style: TextStyle(fontSize: 26)),
+                            title: Row(
+                              children: [
+                                Text(item.day, style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[900])),
+                                SizedBox(width: 8),
+                                Flexible(
+                                  child: Text(
+                                    item.subtopic,
+                                    style: TextStyle(
+                                      fontWeight: isChallenge ? FontWeight.bold : FontWeight.normal,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                if (isChallenge)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: Container(
+                                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange[100],
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text('CHALLENGE', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 2.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(item.topic, style: TextStyle(color: subtitleColor, fontSize: 13)),
+                                  SizedBox(height: 2),
+                                  Text('Date: ${widget.getDynamicDate(item.day)}', style: TextStyle(color: Colors.blueGrey[400], fontSize: 12)),
+                                  SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      Text('Priority: ', style: TextStyle(fontSize: 12)),
+                                      Text(
+                                        item.priority,
+                                        style: TextStyle(
+                                          color: widget.getPriorityColor(item.priority),
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Learning Timer', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800], fontSize: 15)),
+                                    SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        Text('Total: ', style: TextStyle(color: Colors.blue[700], fontSize: 13)),
+                                        Text(formatDuration(widget.totalTimes[key] ?? Duration.zero),
+                                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                                      ],
+                                    ),
+                                    SizedBox(height: 8),
+                                    if ((widget.timingLogs[key]?.isNotEmpty ?? false)) ...[
+                                      Divider(),
+                                      Text('Session Log', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                      SizedBox(height: 4),
+                                      ...widget.timingLogs[key]!.map((log) {
+                                        final start = DateTime.tryParse(log['start'] ?? '') ?? DateTime.now();
+                                        final end = DateTime.tryParse(log['end'] ?? '') ?? DateTime.now();
+                                        final duration = Duration(seconds: log['duration'] ?? 0);
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 2.0),
+                                          child: Text(
+                                            '${start.year}-${start.month.toString().padLeft(2, '0')}-${start.day.toString().padLeft(2, '0')} | '
+                                            'Start: ${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')} | '
+                                            'End: ${end.hour.toString().padLeft(2, '0')}:${end.minute.toString().padLeft(2, '0')} | '
+                                            'Duration: ${formatDuration(duration)}',
+                                            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                              Divider(),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text('Notes', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue[800], fontSize: 15)),
+                                        if (widget.isNoteImportant(key))
+                                          Padding(
+                                            padding: const EdgeInsets.only(left: 8.0),
+                                            child: Icon(Icons.star, color: Colors.orange, size: 20),
+                                          ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 4),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        color: widget.notes[key]?['highlight'] != null ? Color(widget.notes[key]!['highlight']) : Colors.grey[100],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.blue[50]!),
+                                      ),
+                                      child: Text(
+                                        widget.notes[key]?['text'] ?? 'No notes yet.',
+                                        style: widget.getNoteStyle(key),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                child: Row(
+                                  children: [
+                                    ElevatedButton.icon(
+                                      onPressed: () {
+                                        handleUnmarkComplete(key);
+                                      },
+                                      icon: Icon(Icons.mark_email_unread, color: Colors.white),
+                                      label: Text('Mark as Unread'),
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.orange[700]),
+                                    ),
+                                    SizedBox(width: 16),
+                                    ElevatedButton.icon(
+                                      onPressed: () => widget.onResetCard(key),
+                                      icon: Icon(Icons.refresh, color: Colors.white),
+                                      label: Text('Reset Card'),
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red[700]),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -15,6 +15,7 @@ class RoadmapController {
   Map<String, List<Map<String, dynamic>>> timingLogs = {};
   Map<String, Duration> totalTimes = {};
   Map<String, bool> isTiming = {};
+  Map<String, bool> isPaused = {}; // Track paused timers
   Map<String, DateTime?> currentStart = {};
   Timer? timer;
   String? activeKey;
@@ -30,6 +31,7 @@ class RoadmapController {
 
   // Callback for UI updates
   VoidCallback? onTimerUpdate;
+  VoidCallback? onNoteUpdate; // Callback for note updates
 
   RoadmapController(this.model);
 
@@ -71,6 +73,10 @@ class RoadmapController {
     if (completed.contains(key)) {
       completed.remove(key);
     } else {
+      // Marking as completed - stop the timer if it's running for this item
+      if (isTiming[key] == true && activeKey == key) {
+        stopTimer(key);
+      }
       completed.add(key);
       if (key == 'Day 1-Install SDK' && actualStartDate == null) {
         saveActualStartDate(DateTime.now());
@@ -131,31 +137,62 @@ class RoadmapController {
 
   void pauseTimer(String key) {
     if (isTiming[key] != true) return;
+
+    // Cancel the timer but keep the current session
     timer?.cancel();
-    final start = currentStart[key];
-    if (start != null) {
-      final end = DateTime.now();
-      final duration = end.difference(start);
-      isTiming[key] = false;
-      totalTimes[key] = (totalTimes[key] ?? Duration.zero) + duration;
-      timingLogs[key] = (timingLogs[key] ?? [])
-        ..add({
-          'start': start.toIso8601String(),
-          'end': end.toIso8601String(),
-          'duration': duration.inSeconds,
-        });
-      currentStart[key] = null;
-      currentSession = Duration.zero;
-      saveTiming();
+    isTiming[key] = false;
+    isPaused[key] = true;
+
+    // Don't save the session yet, just pause
+    // The session will be saved when stop is called or when timer is resumed and then stopped
+
+    // Notify UI to update
+    onTimerUpdate?.call();
+  }
+
+  void resumeTimer(String key) {
+    if (isTiming[key] == true) return; // Already running
+
+    // Resume the timer
+    isTiming[key] = true;
+    isPaused[key] = false;
+    currentStart[key] = DateTime.now();
+    activeKey = key;
+
+    timer?.cancel();
+    timer = Timer.periodic(Duration(seconds: 1), (_) {
+      currentSession += Duration(seconds: 1);
       // Notify UI to update
       onTimerUpdate?.call();
-    }
+    });
   }
 
   void stopTimer(String key) {
-    pauseTimer(key);
+    if (isTiming[key] == true) {
+      // Timer is running, stop it and save the session
+      timer?.cancel();
+      final start = currentStart[key];
+      if (start != null) {
+        final end = DateTime.now();
+        final duration = end.difference(start);
+        totalTimes[key] = (totalTimes[key] ?? Duration.zero) + duration;
+        timingLogs[key] = (timingLogs[key] ?? [])
+          ..add({
+            'start': start.toIso8601String(),
+            'end': end.toIso8601String(),
+            'duration': duration.inSeconds,
+          });
+      }
+    }
+
+    // Reset everything
+    isTiming[key] = false;
+    isPaused[key] = false;
+    currentStart[key] = null;
     currentSession = Duration.zero;
     activeKey = null;
+    saveTiming();
+
     // Notify UI to update
     onTimerUpdate?.call();
   }
@@ -164,6 +201,7 @@ class RoadmapController {
     totalTimes[key] = Duration.zero;
     timingLogs[key] = [];
     isTiming[key] = false;
+    isPaused[key] = false;
     currentStart[key] = null;
     currentSession = Duration.zero;
     saveTiming();
@@ -173,7 +211,10 @@ class RoadmapController {
 
   String formatDuration(Duration d) {
     String two(int n) => n.toString().padLeft(2, '0');
-    return "${two(d.inHours)}:${two(d.inMinutes % 60)}:${two(d.inSeconds % 60)}";
+    final hours = d.inHours;
+    final minutes = d.inMinutes % 60;
+    final seconds = d.inSeconds % 60;
+    return "${two(hours)}:${two(minutes)}:${two(seconds)}";
   }
 
   Future<void> loadNotes() async {
@@ -201,6 +242,8 @@ class RoadmapController {
       'important': important,
     };
     saveNotes();
+    // Notify UI to update
+    onNoteUpdate?.call();
   }
 
   TextStyle getNoteStyle(String key) {
@@ -218,7 +261,11 @@ class RoadmapController {
     return notes[key]?['important'] == true;
   }
 
-  void showNoteEditor(BuildContext context, String key) {
+  bool isTimerPaused(String key) {
+    return isPaused[key] == true && currentSession > Duration.zero;
+  }
+
+  void showNoteEditor(BuildContext context, String key, {VoidCallback? onNoteSaved}) {
     final note = notes[key];
     final controller = noteControllers[key] ??= TextEditingController(text: note?['text'] ?? '');
     double fontSize = (note?['fontSize'] ?? 16.0) as double;
@@ -368,7 +415,7 @@ class RoadmapController {
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           updateNote(
                             key,
                             controller.text,
@@ -383,6 +430,8 @@ class RoadmapController {
                             important,
                           );
                           Navigator.of(context).pop();
+                          // Call the callback to update UI
+                          onNoteSaved?.call();
                         },
                         child: Text('Save'),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.blue[700]),
@@ -449,7 +498,9 @@ class RoadmapController {
       if (timingLogs[key]!.isEmpty) {
         totalTimes[key] = Duration.zero;
       }
-      saveTiming();
+      await saveTiming();
+      // Notify UI to update
+      onTimerUpdate?.call();
     }
   }
 
@@ -458,6 +509,7 @@ class RoadmapController {
     timingLogs = {};
     totalTimes = {};
     isTiming = {};
+    isPaused = {};
     currentStart = {};
     activeKey = null;
     currentSession = Duration.zero;

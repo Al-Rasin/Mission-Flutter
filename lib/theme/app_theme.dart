@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'app_colors.dart';
 
 class AppTheme {
@@ -11,61 +12,144 @@ class AppTheme {
       backgroundColor: AppColors.lightAppBar,
       foregroundColor: Colors.white,
       elevation: 0,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      ),
+      systemOverlayStyle: SystemUiOverlayStyle.light,
     ),
     cardTheme: CardTheme(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      shadowColor: AppColors.lightTextHint.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
     dividerTheme: DividerThemeData(
       color: AppColors.lightDivider,
       thickness: 1,
+      space: 1,
     ),
     textTheme: TextTheme(
-      bodyLarge: TextStyle(color: AppColors.lightTextPrimary),
-      bodyMedium: TextStyle(color: AppColors.lightTextPrimary),
-      titleLarge: TextStyle(color: AppColors.lightTextPrimary, fontWeight: FontWeight.bold),
+      bodyLarge: TextStyle(
+        color: AppColors.lightTextPrimary,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        color: AppColors.lightTextPrimary,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+      titleLarge: TextStyle(
+        color: AppColors.lightTextPrimary,
+        fontWeight: FontWeight.w700,
+        fontSize: 22,
+      ),
+      titleMedium: TextStyle(
+        color: AppColors.lightTextPrimary,
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
+      ),
+      titleSmall: TextStyle(
+        color: AppColors.lightTextPrimary,
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
+      ),
     ),
     iconTheme: IconThemeData(
       color: AppColors.lightTextSecondary,
+      size: 24,
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.lightInputBackground,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: AppColors.lightInputBorder),
+        borderSide: BorderSide(color: AppColors.lightInputBorder, width: 1),
       ),
-      hintStyle: TextStyle(color: AppColors.lightTextHint),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.lightInputBorder, width: 1),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.primary, width: 2),
+      ),
+      hintStyle: TextStyle(
+        color: AppColors.lightTextHint,
+        fontSize: 14,
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return AppColors.primaryAccent;
+          return AppColors.primary;
         }
         return AppColors.lightTextHint;
       }),
       trackColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return AppColors.primaryAccent.withOpacity(0.5);
+          return AppColors.primary.withOpacity(0.3);
         }
-        return AppColors.lightTextHint.withOpacity(0.5);
+        return AppColors.lightTextHint.withOpacity(0.3);
       }),
     ),
     checkboxTheme: CheckboxThemeData(
       fillColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return AppColors.primaryAccent;
+          return AppColors.primary;
         }
         return AppColors.lightTextHint;
       }),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryDark,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: 2,
+        shadowColor: AppColors.primary.withOpacity(0.3),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: AppColors.lightCardBackground,
+      elevation: 16,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
         ),
       ),
     ),
@@ -80,22 +164,55 @@ class AppTheme {
       backgroundColor: AppColors.darkAppBar,
       foregroundColor: Colors.white,
       elevation: 0,
+      centerTitle: true,
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+        color: Colors.white,
+      ),
+      systemOverlayStyle: SystemUiOverlayStyle.light,
     ),
     cardTheme: CardTheme(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.3),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
     ),
     dividerTheme: DividerThemeData(
       color: AppColors.darkDivider,
       thickness: 1,
+      space: 1,
     ),
     textTheme: TextTheme(
-      bodyLarge: TextStyle(color: AppColors.darkTextPrimary),
-      bodyMedium: TextStyle(color: AppColors.darkTextPrimary),
-      titleLarge: TextStyle(color: AppColors.darkTextPrimary, fontWeight: FontWeight.bold),
+      bodyLarge: TextStyle(
+        color: AppColors.darkTextPrimary,
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+      ),
+      bodyMedium: TextStyle(
+        color: AppColors.darkTextPrimary,
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+      ),
+      titleLarge: TextStyle(
+        color: AppColors.darkTextPrimary,
+        fontWeight: FontWeight.w700,
+        fontSize: 22,
+      ),
+      titleMedium: TextStyle(
+        color: AppColors.darkTextPrimary,
+        fontWeight: FontWeight.w600,
+        fontSize: 18,
+      ),
+      titleSmall: TextStyle(
+        color: AppColors.darkTextPrimary,
+        fontWeight: FontWeight.w600,
+        fontSize: 16,
+      ),
     ),
     iconTheme: IconThemeData(
       color: AppColors.darkTextSecondary,
+      size: 24,
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
@@ -104,37 +221,87 @@ class AppTheme {
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide.none,
       ),
-      hintStyle: TextStyle(color: AppColors.darkTextHint),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: AppColors.primary, width: 2),
+      ),
+      hintStyle: TextStyle(
+        color: AppColors.darkTextHint,
+        fontSize: 14,
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     ),
     switchTheme: SwitchThemeData(
       thumbColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return AppColors.primaryAccent;
+          return AppColors.primary;
         }
         return AppColors.darkTextHint;
       }),
       trackColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return AppColors.primaryAccent.withOpacity(0.5);
+          return AppColors.primary.withOpacity(0.3);
         }
-        return AppColors.darkTextHint.withOpacity(0.5);
+        return AppColors.darkTextHint.withOpacity(0.3);
       }),
     ),
     checkboxTheme: CheckboxThemeData(
       fillColor: MaterialStateProperty.resolveWith((states) {
         if (states.contains(MaterialState.selected)) {
-          return AppColors.primaryAccent;
+          return AppColors.primary;
         }
         return AppColors.darkTextHint;
       }),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primaryDark,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: 2,
+        shadowColor: AppColors.primary.withOpacity(0.3),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        textStyle: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        foregroundColor: AppColors.primary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    ),
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: AppColors.darkCardBackground,
+      elevation: 16,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topRight: Radius.circular(16),
+          bottomRight: Radius.circular(16),
         ),
       ),
     ),

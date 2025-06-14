@@ -1,73 +1,92 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary Colors
-  static const Color primary = Colors.blue;
-  static const Color primaryLight = Color(0xFF64B5F6);
-  static const Color primaryDark = Color(0xFF1976D2);
-  static const Color primaryAccent = Color(0xFF2196F3);
+  // Primary Colors - Modern Blue Palette
+  static const Color primary = Color(0xFF2563EB); // Blue 600
+  static const Color primaryLight = Color(0xFF3B82F6); // Blue 500
+  static const Color primaryDark = Color(0xFF1D4ED8); // Blue 700
+  static const Color primaryAccent = Color(0xFF60A5FA); // Blue 400
 
-  // Background Colors
-  static const Color lightBackground = Color(0xFFF3F8FF); // Light blue tint
-  static const Color darkBackground = Color(0xFF1A1A1A);
+  // Background Colors - Subtle and Professional
+  static const Color lightBackground = Color(0xFFF8FAFC); // Slate 50
+  static const Color darkBackground = Color(0xFF0F172A); // Slate 900
   static const Color lightCardBackground = Colors.white;
-  static const Color darkCardBackground = Color(0xFF2D2D2D);
+  static const Color darkCardBackground = Color(0xFF1E293B); // Slate 800
 
-  // App Bar Colors
-  static const Color lightAppBar = Color(0xFF1976D2); // Blue 700
-  static const Color darkAppBar = Color(0xFF1F1F1F);
+  // App Bar Colors - Clean and Modern
+  static const Color lightAppBar = Color(0xFF2563EB); // Blue 600
+  static const Color darkAppBar = Color(0xFF1E293B); // Slate 800
 
-  // Text Colors
-  static const Color lightTextPrimary = Color(0xFF212121);
-  static const Color lightTextSecondary = Color(0xFF757575);
-  static const Color lightTextHint = Color(0xFFBDBDBD);
-  static const Color darkTextPrimary = Color(0xFFE0E0E0);
-  static const Color darkTextSecondary = Color(0xFFBDBDBD);
-  static const Color darkTextHint = Color(0xFF757575);
+  // Text Colors - High Contrast and Readable
+  static const Color lightTextPrimary = Color(0xFF1E293B); // Slate 800
+  static const Color lightTextSecondary = Color(0xFF64748B); // Slate 500
+  static const Color lightTextHint = Color(0xFF94A3B8); // Slate 400
+  static const Color darkTextPrimary = Color(0xFFF1F5F9); // Slate 100
+  static const Color darkTextSecondary = Color(0xFFCBD5E1); // Slate 300
+  static const Color darkTextHint = Color(0xFF94A3B8); // Slate 400
 
-  // Priority Colors
-  static const Color highPriority = Color(0xFFD32F2F); // Red 700
-  static const Color highPriorityLight = Color(0xFFFFEBEE); // Red 50
-  static const Color mediumPriority = Color(0xFFF57C00); // Orange 700
-  static const Color mediumPriorityLight = Color(0xFFFFF3E0); // Orange 50
-  static const Color lowPriority = Color(0xFF388E3C); // Green 700
-  static const Color lowPriorityLight = Color(0xFFE8F5E8); // Green 50
+  // Priority Colors - Semantic and Accessible
+  static const Color highPriority = Color(0xFFDC2626); // Red 600
+  static const Color highPriorityLight = Color(0xFFFEF2F2); // Red 50
+  static const Color mediumPriority = Color(0xFFEA580C); // Orange 600
+  static const Color mediumPriorityLight = Color(0xFFFFF7ED); // Orange 50
+  static const Color lowPriority = Color(0xFF16A34A); // Green 600
+  static const Color lowPriorityLight = Color(0xFFF0FDF4); // Green 50
 
-  // Status Colors
-  static const Color success = Color(0xFF4CAF50); // Green 500
-  static const Color successLight = Color(0xFFE8F5E8); // Green 50
-  static const Color warning = Color(0xFFFF9800); // Orange 500
-  static const Color warningLight = Color(0xFFFFF3E0); // Orange 50
-  static const Color error = Color(0xFFF44336); // Red 500
-  static const Color errorLight = Color(0xFFFFEBEE); // Red 50
-  static const Color info = Color(0xFF2196F3); // Blue 500
-  static const Color infoLight = Color(0xFFE3F2FD); // Blue 50
+  // Status Colors - Professional and Clear
+  static const Color success = Color(0xFF16A34A); // Green 600
+  static const Color successLight = Color(0xFFF0FDF4); // Green 50
+  static const Color warning = Color(0xFFEA580C); // Orange 600
+  static const Color warningLight = Color(0xFFFFF7ED); // Orange 50
+  static const Color error = Color(0xFFDC2626); // Red 600
+  static const Color errorLight = Color(0xFFFEF2F2); // Red 50
+  static const Color info = Color(0xFF2563EB); // Blue 600
+  static const Color infoLight = Color(0xFFEFF6FF); // Blue 50
 
-  // Challenge Colors
-  static const Color challenge = Color(0xFFFF5722); // Deep Orange 500
-  static const Color challengeLight = Color(0xFFFBE9E7); // Deep Orange 50
+  // Challenge Colors - Vibrant but Professional
+  static const Color challenge = Color(0xFF7C3AED); // Violet 600
+  static const Color challengeLight = Color(0xFFF5F3FF); // Violet 50
 
-  // Divider Colors
-  static const Color lightDivider = Color(0xFFE3F2FD); // Blue 50
-  static const Color darkDivider = Color(0xFF424242);
+  // Divider Colors - Subtle and Clean
+  static const Color lightDivider = Color(0xFFE2E8F0); // Slate 200
+  static const Color darkDivider = Color(0xFF334155); // Slate 700
 
-  // Input Colors
+  // Input Colors - Clean and Accessible
   static const Color lightInputBackground = Colors.white;
-  static const Color darkInputBackground = Color(0xFF2D2D2D);
-  static const Color lightInputBorder = Color(0xFFE0E0E0);
-  static const Color darkInputBorder = Color(0xFF424242);
+  static const Color darkInputBackground = Color(0xFF334155); // Slate 700
+  static const Color lightInputBorder = Color(0xFFCBD5E1); // Slate 300
+  static const Color darkInputBorder = Color(0xFF475569); // Slate 600
 
-  // Timer Colors
-  static const Color timerActive = Color(0xFF1976D2); // Blue 700
-  static const Color timerPaused = Color(0xFFFF9800); // Orange 500
-  static const Color timerStopped = Color(0xFFF44336); // Red 500
+  // Timer Colors - Clear and Intuitive
+  static const Color timerActive = Color(0xFF2563EB); // Blue 600
+  static const Color timerPaused = Color(0xFFEA580C); // Orange 600
+  static const Color timerStopped = Color(0xFFDC2626); // Red 600
 
-  // Note Colors
-  static const Color noteYellow = Color(0xFFFFEB3B); // Yellow 500
-  static const Color noteGreen = Color(0xFF8BC34A); // Light Green 500
-  static const Color noteCyan = Color(0xFF00BCD4); // Cyan 500
-  static const Color notePink = Color(0xFFE91E63); // Pink 500
-  static const Color noteAmber = Color(0xFFFFC107); // Amber 500
+  // Note Colors - Pleasant and Distinctive
+  static const Color noteYellow = Color(0xFFEAB308); // Yellow 500
+  static const Color noteGreen = Color(0xFF22C55E); // Green 500
+  static const Color noteCyan = Color(0xFF06B6D4); // Cyan 500
+  static const Color notePink = Color(0xFFEC4899); // Pink 500
+  static const Color noteAmber = Color(0xFFF59E0B); // Amber 500
+
+  // Gradient Colors for Enhanced Visual Appeal
+  static const LinearGradient primaryGradient = LinearGradient(
+    colors: [primary, primaryLight],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient cardGradient = LinearGradient(
+    colors: [Colors.white, Color(0xFFF8FAFC)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient darkCardGradient = LinearGradient(
+    colors: [Color(0xFF1E293B), Color(0xFF334155)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   // Get priority color based on priority string
   static Color getPriorityColor(String priority, {bool background = false}) {

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../theme/theme_preference.dart';
 import '../../theme/app_colors.dart';
+import '../../utils/confirmation_dialog.dart';
 import 'settings_controller.dart';
-import 'settings_model.dart';
 
 class SettingsView extends StatefulWidget {
   final ThemePreference themePreference;
@@ -39,23 +38,16 @@ class _SettingsViewState extends State<SettingsView> {
   }
 
   void _onResetApp() async {
-    final confirmed = await showDialog<bool>(
+    final confirmed = await ConfirmationDialog.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Reset App'),
-        content: Text('Are you sure you want to reset all app data? This cannot be undone.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text('Reset', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: 'Reset App',
+      message:
+          'Are you sure you want to reset all app data? This will clear:\n\n• All progress tracking\n• Timer logs\n• Notes\n• Settings\n\nThis action cannot be undone.',
+      confirmText: 'Reset',
+      cancelText: 'Cancel',
+      confirmColor: AppColors.error,
     );
+
     if (confirmed == true) {
       await _controller.resetApp();
       if (mounted) Navigator.of(context).pop(true);
@@ -254,52 +246,22 @@ class _SettingsViewState extends State<SettingsView> {
     );
   }
 
-  void _showResetDialog(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = AppColors.getCardColor(isDark);
-    final textColor = AppColors.getTextPrimaryColor(isDark);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: cardColor,
-          title: Text(
-            'Reset App Data',
-            style: TextStyle(color: textColor),
-          ),
-          content: Text(
-            'Are you sure you want to reset all app data? This will clear:\n\n• All progress tracking\n• Timer logs\n• Notes\n• Settings\n\nThis action cannot be undone.',
-            style: TextStyle(color: textColor),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: TextStyle(color: AppColors.getTextSecondaryColor(isDark)),
-              ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _resetAppData();
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.error,
-                foregroundColor: Colors.white,
-              ),
-              child: Text('Reset'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _resetAppData() async {
-    final success = await _controller.resetApp();
-    if (mounted) {
-      Navigator.of(context).pop(success);
+    final confirmed = await ConfirmationDialog.show(
+      context: context,
+      title: 'Reset App Data',
+      message:
+          'Are you sure you want to reset all app data? This will clear:\n\n• All progress tracking\n• Timer logs\n• Notes\n• Settings\n\nThis action cannot be undone.',
+      confirmText: 'Reset',
+      cancelText: 'Cancel',
+      confirmColor: AppColors.error,
+    );
+
+    if (confirmed == true) {
+      final success = await _controller.resetApp();
+      if (mounted) {
+        Navigator.of(context).pop(success);
+      }
     }
   }
 }

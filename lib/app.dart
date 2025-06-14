@@ -52,6 +52,7 @@ class _FlutterRoadmapAppState extends State<FlutterRoadmapApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Mission Flutter',
+      debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: _themeMode,
